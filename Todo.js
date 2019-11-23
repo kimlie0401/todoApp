@@ -10,60 +10,101 @@ import {
   ScrollView,
   TouchableOpacity
 } from "react-native";
+import Swipeout from "react-native-swipeout";
 
 const { height, width } = Dimensions.get("window");
+
+var swipeoutBtns = [
+  {
+    backgroundColor: "",
+    color: "white",
+    text: "Edit",
+    onPress: () => alert("Edit")
+  },
+  {
+    backgroundColor: "red",
+    color: "white",
+    text: "Delete",
+    onPress: () => alert("Delte")
+  }
+];
 
 export default class Todo extends Component {
   state = {
     isEditing: false,
-    isCompleted: false
+    isCompleted: false,
+    todoValue: ""
   };
   render() {
-    const { isCompleted, isEditing } = this.state;
+    const { isCompleted, isEditing, todoValue } = this.state;
+    const { text } = this.props;
     return (
-      <View style={styles.container}>
-        <View style={styles.column}>
-          <TouchableOpacity onPress={this._toggleComplete}>
-            <View
-              style={[
-                styles.circle,
-                isCompleted ? styles.completedCircle : styles.uncompletedCircle
-              ]}
-            />
-          </TouchableOpacity>
-          <Text
-            style={[
-              styles.text,
-              isCompleted ? styles.completedText : styles.uncompletedText
-            ]}
-          >
-            Hello I'm Todo
-          </Text>
-        </View>
+      <Swipeout
+        right={swipeoutBtns}
+        backgroundColor="white"
+        disabled={isEditing ? true : false}
+      >
+        <View style={styles.container}>
+          <View style={styles.column}>
+            <TouchableOpacity onPress={this._toggleComplete}>
+              <View
+                style={[
+                  styles.circle,
+                  isCompleted
+                    ? styles.completedCircle
+                    : styles.uncompletedCircle
+                ]}
+              />
+            </TouchableOpacity>
+            {isEditing ? (
+              <TextInput
+                style={[
+                  styles.input,
+                  styles.text,
+                  isCompleted ? styles.completedText : styles.uncompletedText
+                ]}
+                value={todoValue}
+                multiline={true}
+                onChangeText={this._controlInput}
+                returnKeyType={"done"}
+                onBlur={this._finishEditing}
+              />
+            ) : (
+              <Text
+                style={[
+                  styles.text,
+                  isCompleted ? styles.completedText : styles.uncompletedText
+                ]}
+              >
+                {text}
+              </Text>
+            )}
+          </View>
 
-        {isEditing ? (
-          <View style={styles.action}>
-            <TouchableOpacity onPressOut={this._finishEditing}>
-              <View style={styles.actionContainer}>
-                <Text style={styles.actionText}>✅</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        ) : (
-          <View style={styles.action}>
-            <TouchableOpacity onPressOut={this._startEditing}>
-              <View style={styles.actionContainer}>
-                <Text style={styles.actionText}>✏️</Text>
-              </View>
-            </TouchableOpacity>
-            <TouchableOpacity>
-              <View style={styles.actionContainer}>
-                <Text style={styles.actionText}>❌</Text>
-              </View>
-            </TouchableOpacity>
-          </View>
-        )}
-      </View>
+          {isEditing ? (
+            <View style={styles.action}>
+              <TouchableOpacity onPressOut={this._finishEditing}>
+                <View style={styles.actionContainer}>
+                  <Text style={styles.actionText}>✅</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.action}>
+              <TouchableOpacity onPressOut={this._startEditing}>
+                <View style={styles.actionContainer}>
+                  <Text style={styles.actionText}>✏️</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity>
+                <View style={styles.actionContainer}>
+                  <Text style={styles.actionText}>❌</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+          )}
+        </View>
+      </Swipeout>
     );
   }
   _toggleComplete = () => {
@@ -74,13 +115,20 @@ export default class Todo extends Component {
     });
   };
   _startEditing = () => {
+    const { text } = this.props;
     this.setState({
-      isEditing: true
+      isEditing: true,
+      todoValue: text
     });
   };
   _finishEditing = () => {
     this.setState({
       isEditing: false
+    });
+  };
+  _controlInput = text => {
+    this.setState({
+      todoValue: text
     });
   };
 }
@@ -131,5 +179,9 @@ const styles = StyleSheet.create({
   actionContainer: {
     marginVertical: 10,
     marginHorizontal: 10
+  },
+  input: {
+    marginVertical: 15,
+    width: width / 2
   }
 });
