@@ -28,7 +28,9 @@ export default class Todo extends Component {
     text: PropTypes.string.isRequired,
     isCompleted: PropTypes.bool.isRequired,
     deleteToDo: PropTypes.func.isRequired,
-    id: PropTypes.string.isRequired
+    id: PropTypes.string.isRequired,
+    completeToDo: PropTypes.func.isRequired,
+    uncompleteToDo: PropTypes.func.isRequired
   };
 
   swipeoutBtns = [
@@ -46,12 +48,15 @@ export default class Todo extends Component {
       backgroundColor: "red",
       color: "white",
       text: "Delete",
-      onPress: () => alert("Delte")
+      onPress: () => {
+        const { id, deleteToDo } = this.props;
+        deleteToDo(id);
+      }
     }
   ];
   render() {
-    const { isCompleted, isEditing, todoValue } = this.state;
-    const { text, id, deleteToDo } = this.props;
+    const { isEditing, todoValue } = this.state;
+    const { text, id, deleteToDo, isCompleted } = this.props;
     return (
       <Swipeout
         right={this.swipeoutBtns}
@@ -123,11 +128,12 @@ export default class Todo extends Component {
     );
   }
   _toggleComplete = () => {
-    this.setState(prevState => {
-      return {
-        isCompleted: !prevState.isCompleted
-      };
-    });
+    const { isCompleted, completeToDo, uncompleteToDo, id } = this.props;
+    if (isCompleted) {
+      uncompleteToDo(id);
+    } else {
+      completeToDo(id);
+    }
   };
   _startEditing = () => {
     this.setState({
