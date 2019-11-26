@@ -30,7 +30,8 @@ export default class Todo extends Component {
     deleteToDo: PropTypes.func.isRequired,
     id: PropTypes.string.isRequired,
     completeToDo: PropTypes.func.isRequired,
-    uncompleteToDo: PropTypes.func.isRequired
+    uncompleteToDo: PropTypes.func.isRequired,
+    updateToDo: PropTypes.func.isRequired
   };
 
   swipeoutBtns = [
@@ -141,9 +142,10 @@ export default class Todo extends Component {
     });
   };
   _finishEditing = () => {
-    this.setState({
-      isEditing: false
-    });
+    const { todoValue } = this.state;
+    const { id, updateToDo } = this.props;
+    updateToDo(id, todoValue);
+    this.setState({ isEditing: false });
   };
   _controlInput = text => {
     this.setState({
